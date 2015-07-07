@@ -1,0 +1,12 @@
+<h3> Hippocampal volume plots </h3>
+<p> Put a pretty plot here! </p>
+<p> Or here! </p>
+<!-- 
+	d3 should be loaded in index.html, so you should be able to use it here, as in the example below. 
+	This randomly colors paragraphs- it should only affect things in this html file, not the parent. 
+-->
+<script>
+d3.selectAll("p").style("color", function() {
+  return "hsl(" + Math.random() * 360 + ",100%,50%)";
+});
+</script>
