@@ -1,0 +1,48 @@
+<h3> Database Statistics </h3>
+<p> {{data || "Loading"}} </p>
+<div class="insert">
+	<h4>.</h4>
+</div>
+<script>
+// TODO fix this function so the d3 image is inserted in the correct place
+function d3cluster(data) {
+	schemakids=[];
+
+	$.each(data, function(s) {
+		kids = [];
+		$.each(data[s], function(t){
+			val = data[s][t];
+			kids.push({"name":t+': '+val, "size": val*5});
+		});
+		schemakids.push({"name": s, "children":kids});
+	});
+
+	root = {"name": "afbrains02", "children": schemakids};
+
+	var width = 800;
+	var height = 700;
+	var diagonal = d3.svg.diagonal().projection (function(d) { return [d.y, d.x];}); 
+	var cluster = d3.layout.cluster().size([height-200, width-300]);
+	var svg = d3.select("h4").append("svg").attr("width",width).attr("height",height).append("g").attr("transform","translate(100,0)");
+	var nodes = cluster.nodes(root);
+	var links = cluster.links(nodes); 
+	var link = svg.selectAll(".link")       
+      .data(links)       
+      .enter().append("path")       
+      .attr("class","link")       
+      .attr("d", diagonal);     
+	var node = svg.selectAll(".node")       
+      .data(nodes)       
+      .enter().append("g")       
+      .attr("class","node")       
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });    
+    node.append("circle")       
+      .attr("r", 4.5);    
+    node.append("text")       
+      .attr("dx", function(d) { return d.children ? -8 : 8; })       
+      .attr("dy", 3)       
+      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })      
+      .text( function(d){ return d.name;}); 	
+}
+
+</script>

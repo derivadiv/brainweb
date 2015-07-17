@@ -1,14 +1,12 @@
-# Starting simple HTTP server, code from https://docs.python.org/2/library/simplehttpserver.html
-
+# Starting simple HTTP server
 import SimpleHTTPServer
-import SocketServer
+import BaseHTTPServer
+from routes import BrainHandler
 
-PORT = 8000
+params = ('localhost',8000)
 
-Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+httpd = BaseHTTPServer.HTTPServer(params, BrainHandler)
 
-httpd = SocketServer.TCPServer(("", PORT), Handler)
-
-print "serving at port", PORT
+print "serving at port ", params[1]
 httpd.serve_forever()
-# at http://127.0.0.1:8000
+# at http://localhost:8000
