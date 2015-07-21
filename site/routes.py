@@ -19,5 +19,4 @@ class BrainHandler(Handler):
 		elif self.path == '/hippovol': 
 			c = queries.hipVols()
 			res = {'data':c}
-			print c
 			self.wfile.write(json.dumps(res))

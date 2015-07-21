@@ -64,14 +64,16 @@ def hipVols(numtries = 2):
 					row.extend(qrows[0])
 				newrows.append(row)
 
-			# conversion to dict objects- should have thought of this earlier...
 			psql.dbend(conn)
-			oldrows = newrows
-			newrows = []
-			for row in oldrows:
-				obj = {}
-				for i in range(len(cols)):
-					obj[cols[i]] = row[i]
-				newrows.append(obj)
+			newrows = [cols] + newrows
 			return newrows
-	return 
+			# conversion to dict objects- should have thought of this earlier...
+			# oldrows = newrows
+			# newrows = []
+			# for row in oldrows:
+			# 	obj = {}
+			# 	for i in range(len(cols)):
+			# 		obj[cols[i]] = row[i]
+			# 	newrows.append(obj)
+			# return newrows
+	return []
