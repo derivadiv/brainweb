@@ -7,12 +7,18 @@ app.config(function($routeProvider){
 		.when('/test', { 
 			templateUrl: 'test.html',
 			controller: 'BrainCtrl'
+		})
+		.when('/dbq', {
+			templateUrl: 'dbq.html'
 		});
 });
 
 function BrainCtrl($scope, $http){
 	$http.post('/testme').success(function(res) {
-		$scope.data = res['data']
+		$scope.data = res['data'];
+	});
+	$http.post('/hippovol').success(function(res) {
+		$scope.data = res['data'];
 	});
 }
 

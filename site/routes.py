@@ -1,10 +1,7 @@
 # Handling routes
 import SimpleHTTPServer
 import json
-try:
-	import queries
-except:
-	queries=None
+import queries
 
 Handler = SimpleHTTPServer.SimpleHTTPRequestHandler # module not instance
 
@@ -14,9 +11,11 @@ class BrainHandler(Handler):
 	def do_POST(self):
 		if self.path == '/testme':
 			# get database query?
-			if queries:
-				c = queries.dbStats()
-				res = {'data':c}
-			else:
-				res = {'data':{'schema1':{'table1':200,'table2':300},'schema2':{'table3': 400}}}
+			c = queries.dbStats()
+			res = {'data':c}
+			self.wfile.write(json.dumps(res))
+		elif self.path == '/hippovol': 
+			c = queries.hipVols()
+			res = {'data':c}
+			print c
 			self.wfile.write(json.dumps(res))

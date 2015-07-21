@@ -1,16 +1,79 @@
+# module for query translation, intermediate between backend database calls and website routes
 import os, sys
-sys.path.append("/home/gridsan/dpillai/sandbox") #replace with module location if it moves
-import psql
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'src'))
+try: 
+	import psql
+except:
+	psql = None # for working/ testing locally outside SuperCloud
 
-# module for query translation?
+def dbStats(numtries = 2):
+	conn = None
+	if psql:
+		while conn is None and numtries > 0:
+			conn = psql.dbstart()
+			numtries = numtries - 1
+		if conn:
+			schemas = psql.allSchemas(conn)
+			nestedresponse = {}
+			for s in schemas:
+				nestedresponse[s] = {}
+				tables = psql.tablesInSchema(conn, s)
+				for t in tables:
+					v = psql.countall(conn, t, schemaname=s)
+					nestedresponse[s][t] = v
+			psql.dbend(conn)
+			return nestedresponse
+	return {'data':{'schema1':{'table1':200,'table2':300},'schema2':{'table3': 400}}}
 
-def dbStats():
-	schemas = psql.allSchemas()
-	nestedresponse = {}
-	for s in schemas:
-		nestedresponse[s] = {}
-		tables = psql.tablesInSchema(s)
-		for t in tables:
-			v = psql.countall(tablename=t, schemaname=s)
-			nestedresponse[s][t] = v
-	return nestedresponse
+def hipVols(numtries = 2):
+	conn = None
+	if psql:
+		while conn is None and numtries > 0:
+			conn = psql.dbstart()
+			numtries = numtries - 1
+		if conn:
+			# freesurfer hip_vol
+			cols = ['Subject', 'MRN', 'normTot_volume']
+			fhiprows = psql.selectDB(conn, ['Subject', 'MRN', 'normTot_volume'], "hip_vol", "freesurfer")
+			# adding date and dicom file name?
+			cols.extend(['Date','Dicom'])
+			oldrows = fhiprows
+			newrows = []
+			for row in oldrows:
+				subject = row[0]
+				flogrows = psql.selectDB(conn,['Date','Dicom'],"log_files","freesurfer",whereclause="Subject is '%s'"%subject)
+				if len(flogrows) > 0:
+					row.extend(flogrows[0])
+				newrows.append(row)
+			# adding birthdate from rpdr
+			cols.extend(['Date_of_Birth'])
+			oldrows = newrows
+			newrows = []
+			for row in oldrows:
+				mrn = row[1]
+				qrows = psql.selectDB(conn,['Date_of_Birth'],"Dem","rpdr",whereclause="MRN is %s"%mrn)
+				if len(qrows) > 0:
+					row.extend(qrows[0])
+				newrows.append(row)
+			# adding DICOM information? how about seriesdescription, protocolname, and patientage?
+			cols.extend(['SeriesDescription','ProtocolName','PatientAge'])
+			oldrows = newrows
+			newrows = []
+			for row in oldrows:
+				dicom = row[4]
+				qrows = psql.selectDB(conn,['SeriesDescription','ProtocolName','PatientAge'],"imagemeta","dicom",whereclause="FilePath is %s" % dicom)
+				if len(qrows) > 0:
+					row.extend(qrows[0])
+				newrows.append(row)
+
+			# conversion to dict objects- should have thought of this earlier...
+			psql.dbend(conn)
+			oldrows = newrows
+			newrows = []
+			for row in oldrows:
+				obj = {}
+				for i in range(len(cols)):
+					obj[cols[i]] = row[i]
+				newrows.append(obj)
+			return newrows
+	return 
