@@ -3,6 +3,13 @@ import psycopg2
 # database params stored in config.connectstr
 from config import connectstr 
 
+# fixing Decimal types?
+DEC2FLOAT = psycopg2.extensions.new_type(
+    psycopg2.extensions.DECIMAL.values,
+    'DEC2FLOAT',
+    lambda value, curs: float(value) if value is not None else None)
+psycopg2.extensions.register_type(DEC2FLOAT)
+
 # Connect to database, setup of needed schema/table(s)
 def dbstart(schemaname=None, tablename=None, coltags=[], connectstr=connectstr):
     try:

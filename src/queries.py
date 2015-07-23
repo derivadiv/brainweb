@@ -39,9 +39,10 @@ def hipVols(numtries = 2):
 			newrows = []
 			for row in oldrows:
 				subject = row[0]
-				flogrows = psql.selectDB(conn,['Date','Dicom'],"log_files","freesurfer",whereclause="Subject is '%s'"%subject)
-				if len(flogrows) > 0:
-					row.extend(flogrows[0])
+				row = list(row)
+				qrows = psql.selectDB(conn,['Date','Dicom'],"log_files","freesurfer",whereclause="Subject = '%s'"%subject)
+				if qrows is not None and len(qrows) > 0:
+					row.extend(list(qrows[0]))
 				newrows.append(row)
 			# adding birthdate from rpdr
 			cols.extend(['Date_of_Birth'])
@@ -49,9 +50,9 @@ def hipVols(numtries = 2):
 			newrows = []
 			for row in oldrows:
 				mrn = row[1]
-				qrows = psql.selectDB(conn,['Date_of_Birth'],"Dem","rpdr",whereclause="MRN is %s"%mrn)
-				if len(qrows) > 0:
-					row.extend(qrows[0])
+				qrows = psql.selectDB(conn,['Date_of_Birth'],"Dem","rpdr",whereclause="MRN = '%s'"%mrn)
+				if qrows is not None and len(qrows) > 0:
+					row.extend(list(qrows[0]))
 				newrows.append(row)
 			# adding DICOM information? how about seriesdescription, protocolname, and patientage?
 			cols.extend(['SeriesDescription','ProtocolName','PatientAge'])
@@ -59,9 +60,9 @@ def hipVols(numtries = 2):
 			newrows = []
 			for row in oldrows:
 				dicom = row[4]
-				qrows = psql.selectDB(conn,['SeriesDescription','ProtocolName','PatientAge'],"imagemeta","dicom",whereclause="FilePath is %s" % dicom)
-				if len(qrows) > 0:
-					row.extend(qrows[0])
+				qrows = psql.selectDB(conn,['SeriesDescription','ProtocolName','PatientAge'],"imagemeta","dicom",whereclause="FilePath LIKE '%s'" % dicom)
+				if qrows is not None and len(qrows) > 0:
+					row.extend(list(qrows[0]))
 				newrows.append(row)
 
 			psql.dbend(conn)
