@@ -68,13 +68,5 @@ def hipVols(numtries = 2):
 			psql.dbend(conn)
 			newrows = [cols] + newrows
 			return newrows
-			# conversion to dict objects- should have thought of this earlier...
-			# oldrows = newrows
-			# newrows = []
-			# for row in oldrows:
-			# 	obj = {}
-			# 	for i in range(len(cols)):
-			# 		obj[cols[i]] = row[i]
-			# 	newrows.append(obj)
-			# return newrows
-	return []
+	# otherwise, fake test data can be returned?
+	return [['Subject', 'MRN', 'normTot_volume','Date','Dicom','Date_of_Birth','SeriesDescription','ProtocolName','PatientAge'],['subj###', '###', 0.12,'DateTime1','FilePath','DateTime2','Series','T1Weighted',18]];
