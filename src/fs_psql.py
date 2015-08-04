@@ -52,14 +52,24 @@ def insert_fs_csv(conn, tname, filename):
 	with open(filename, 'rb') as f:
 		head = f.readline()
 		cols = [x.replace(" ","").strip() for x in head.split(',')]
-		# cols should be Subject, Date, Version, Dicom, Orig Log File
 		for line in f:
-			vals = ["'"+x.strip()+"'" for x in line.split(',')]
+			vals = [x.strip() for x in line.split(',')]
 			if len(vals)==len(cols):
-				# database insertion?
+				# hippocampus table-specific fixes
+				if 'hip_vol' in tname:
+					# MRN should only include the number
+					vals[1] = str.join('',[a for a in vals[1] if a.isdigit()])
+					# columns after that must be numbers (decimal)- if not, replace with 0
+					for v in range(2,len(vals)):
+						try:
+							vals[v] = float(vals[v][1:-1])
+						except ValueError:
+							vals[v] = 0
+				# database insertion
 				try:
-					qstr = "INSERT INTO "+tname+" ("+", ".join(cols)+") VALUES ("+", ".join(vals)+")"
+					qstr = "INSERT INTO "+tname+" ("+", ".join(cols)+") VALUES ("+", ".join(['%s']*len(vals))+")"
 					cur.execute(qstr,vals)
+					conn.commit()
 				except:
 					print 'Insertion into '+tname+' didn\'t work on '+vals[0]
 					conn.rollback()
