@@ -1,7 +1,7 @@
 # README #
 
 ### Usage ###
+* Navigate to the "site" directory (on SuperCloud, `cd /home/gridsan/groups/babybrains/brainweb/site`)
 * Start the server: `python server.py`
-* Open browser (on SuperCloud, just type `firefox`) and navigate to http://localhost:8000 (or if that doesn't work, ex. on SuperCloud, go to http://127.0.0.1:8000). 
+* Open browser: on SuperCloud, open a new terminal window that has X-forwarding enabled (ssh -Y) and just type `firefox`. Navigate to localhost:8000 (or http://127.0.0.1:8000). 
 
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
